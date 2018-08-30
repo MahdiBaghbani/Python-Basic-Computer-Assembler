@@ -17,14 +17,13 @@ def preprocess(source: str):
 
 
 def precompile(line: str, line_number: int, declaration: list, usage: list) -> tuple:
-
     end = "END"
-    mnemonics = ["AND", "ADD", "LDA", "STA", "BUN",
-                 "BSA", "ISZ", "CLA", "CLE", "CMA",
-                 "CME", "CIR", "CIL", "INC", "SPA",
-                 "SNA", "SZA", "SZE", "HLT", "INP",
-                 "OUT", "SKI", "SKO", "ION", "IOF",
-                 "ORG", "DEC", "HEX", end]
+    mnemonic = ["AND", "ADD", "LDA", "STA", "BUN",
+                "BSA", "ISZ", "CLA", "CLE", "CMA",
+                "CME", "CIR", "CIL", "INC", "SPA",
+                "SNA", "SZA", "SZE", "HLT", "INP",
+                "OUT", "SKI", "SKO", "ION", "IOF",
+                "ORG", "DEC", "HEX", end]
     exceptionalMnemonics = ["ORG", "HEX", "DEC", end]
 
     error_counter = 0
@@ -46,8 +45,38 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> t
     return declaration, usage, error_counter
 
 
-def show_error(error_code: int, line_number: int):
+def handle_first_element(word: str, declaration: list, mnemonic: list, line_number: int) -> tuple:
+    error_counter = 0
+    if test_char(word, 'first'):
+        error_counter += show_error(3, line_number)
+    if not test_char(word, 'comma'):
+        error_counter += show_error(4, line_number)
 
+
+def test_char(word: str, mode:str) -> int:
+    if mode == 'first':
+        if word[0].isdigit():
+            return True
+        else:
+            return False
+    elif mode == 'comma':
+        if word[-1] == ',':
+            return True
+        else:
+            return False
+    elif mode == 'i':
+        if word == 'i':
+            return True
+        else:
+            return False
+    elif mode == 'length':
+        if len(word) == 3:
+            return True
+        else:
+            return False
+
+
+def show_error(error_code: int, line_number: int):
     if error_code == 1:
         print("\nERROR (line => {}): Exceeded max word in one line limit.\n".format(line_number))
 
