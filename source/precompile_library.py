@@ -1,20 +1,39 @@
 MAX_LINE = 50
 
 
-def precompile(line: str, line_number: int, declaration: list, usage: list) -> int:
+def preprocess(source: str):
+    declaration = list()
+    usage = list()
+    error_counter = 0
+    line_number = 1
+    lines = source.split('\n')
+    for line in lines:
+        if line_number > MAX_LINE:
+            error_counter += show_error(11, line_number)
+            break
+        declaration, usage, err_c = precompile(line, line_number, declaration, usage)
+        error_counter += err_c
+        line_number += 1
+
+
+def precompile(line: str, line_number: int, declaration: list, usage: list) -> tuple:
+
+    end = "END"
     mnemonics = ["AND", "ADD", "LDA", "STA", "BUN",
                  "BSA", "ISZ", "CLA", "CLE", "CMA",
                  "CME", "CIR", "CIL", "INC", "SPA",
                  "SNA", "SZA", "SZE", "HLT", "INP",
                  "OUT", "SKI", "SKO", "ION", "IOF",
-                 "ORG", "DEC", "HEX", "END"]
-    error_counter = 0
+                 "ORG", "DEC", "HEX", end]
+    exceptionalMnemonics = ["ORG", "HEX", "DEC", end]
 
-    line = line.split()
-    words_number = len(line)
+    error_counter = 0
+    string = line.split()
+    words_number = len(string)
 
     if words_number == 1:
-        pass
+        if string[0] != end:
+            error_counter += show_error(2, line_number)
     elif words_number == 2:
         pass
     elif words_number == 3:
@@ -22,14 +41,12 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> i
     elif words_number == 4:
         pass
     else:
-        pass
+        error_counter += show_error(1, line_number)
 
-    return error_counter
+    return declaration, usage, error_counter
 
 
-def show_error(error_code, line_number, error_counter):
-
-    error_counter += 1
+def show_error(error_code: int, line_number: int):
 
     if error_code == 1:
         print("\nERROR (line => {}): Exceeded max word in one line limit.\n".format(line_number))
@@ -89,4 +106,4 @@ def show_error(error_code, line_number, error_counter):
     else:
         print("\nINTERNAL ERROR: Invalid error code.")
 
-    return error_counter
+    return 1
