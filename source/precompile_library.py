@@ -47,33 +47,54 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> t
 
 def handle_first_element(word: str, declaration: list, mnemonic: list, line_number: int) -> tuple:
     error_counter = 0
-    if test_char(word, 'first'):
-        error_counter += show_error(3, line_number)
     if not test_char(word, 'comma'):
         error_counter += show_error(4, line_number)
+    if test_word_len(word, 1):
+        error_counter += show_error(10, line_number)
+    word = word[:-1]
+    error_counter += test_basic(word, mnemonic, line_number)
+    declaration.append(word)
+    return declaration, error_counter
 
 
-def test_char(word: str, mode:str) -> int:
+def handle_third_element(word: str, usage: list, mnemonic: list, line_number: int) -> tuple:
+    error_counter = 0
+    error_counter += test_basic(word, mnemonic, line_number)
+    usage.append(word)
+    return usage, error_counter
+
+
+def test_basic(word: str, mnemonic: list, line_number: int) -> int:
+    error_counter = 0
+    if test_char(word, 'first'):
+        error_counter += show_error(3, line_number)
+    if not test_char(word, 'length'):
+        error_counter += show_error(12, line_number)
+    if compare_list_string(mnemonic, word):
+        error_counter += show_error(7, line_number)
+    return error_counter
+
+
+def test_char(word: str, mode: str) -> bool:
     if mode == 'first':
-        if word[0].isdigit():
-            return True
-        else:
-            return False
+        return word[0].isdigit()
     elif mode == 'comma':
-        if word[-1] == ',':
-            return True
-        else:
-            return False
+        return word[-1] == ','
     elif mode == 'i':
-        if word == 'i':
-            return True
-        else:
-            return False
+        return word == 'i'
     elif mode == 'length':
-        if len(word) == 3:
+        return test_word_len(word, 3)
+
+
+def test_word_len(word: str, length: int) -> bool:
+    return len(word) == length
+
+
+def compare_list_string(s_list: list, word: str) -> bool:
+    for i in s_list:
+        if i == word:
             return True
-        else:
-            return False
+    return False
 
 
 def show_error(error_code: int, line_number: int):
