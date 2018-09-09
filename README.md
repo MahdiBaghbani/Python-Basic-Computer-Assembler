@@ -1,0 +1,2 @@
+# Python-Compiler [![CodeFactor](https://www.codefactor.io/repository/github/mahdibaghbani/python-compiler/badge)](https://www.codefactor.io/repository/github/mahdibaghbani/python-compiler) [![Maintainability](https://api.codeclimate.com/v1/badges/8d67f17f4fc096f16c31/maintainability)](https://codeclimate.com/github/MahdiBaghbani/Python-Encryption/maintainability)
+A project to write a compiler in python language to compile Assembly source codes for 16-bit CPU architecture  
