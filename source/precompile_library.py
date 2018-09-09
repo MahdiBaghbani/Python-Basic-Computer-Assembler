@@ -1,4 +1,5 @@
 MAX_LINE = 50
+NOTHING = 'NOTHING'
 
 
 def preprocess(source: str):
@@ -18,12 +19,12 @@ def preprocess(source: str):
 
 def precompile(line: str, line_number: int, declaration: list, usage: list) -> tuple:
     end = "END"
-    mnemonic = ["AND", "ADD", "LDA", "STA", "BUN",
-                "BSA", "ISZ", "CLA", "CLE", "CMA",
-                "CME", "CIR", "CIL", "INC", "SPA",
-                "SNA", "SZA", "SZE", "HLT", "INP",
-                "OUT", "SKI", "SKO", "ION", "IOF",
-                "ORG", "DEC", "HEX", end]
+    mnemonics = ["AND", "ADD", "LDA", "STA", "BUN",
+                 "BSA", "ISZ", "CLA", "CLE", "CMA",
+                 "CME", "CIR", "CIL", "INC", "SPA",
+                 "SNA", "SZA", "SZE", "HLT", "INP",
+                 "OUT", "SKI", "SKO", "ION", "IOF",
+                 "ORG", "DEC", "HEX", end]
     exceptionalMnemonics = ["ORG", "HEX", "DEC", end]
 
     error_counter = 0
@@ -45,34 +46,76 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> t
     return declaration, usage, error_counter
 
 
-def handle_first_element(word: str, declaration: list, mnemonic: list, line_number: int) -> tuple:
+def handle_first_element(word: str, declaration: list, mnemonics: list, line_number: int) -> tuple:
     error_counter = 0
     if not test_char(word, 'comma'):
         error_counter += show_error(4, line_number)
-    if test_word_len(word, 1):
-        error_counter += show_error(10, line_number)
-    word = word[:-1]
-    error_counter += test_basic(word, mnemonic, line_number)
-    declaration.append(word)
+        declaration.append(NOTHING)
+    else:
+        word = word[:-1]
+        state, err_c = test_basic(word, mnemonics, line_number)
+        error_counter += err_c
+        if state:
+            declaration.append(word)
+        else:
+            declaration.append(NOTHING)
     return declaration, error_counter
 
 
-def handle_third_element(word: str, usage: list, mnemonic: list, line_number: int) -> tuple:
+def handle_third_element(word: str, usage: list, mnemonics: list, line_number: int) -> tuple:
     error_counter = 0
-    error_counter += test_basic(word, mnemonic, line_number)
-    usage.append(word)
+    state, err_c = test_basic(word, mnemonics, line_number)
+    error_counter += err_c
+    if state:
+        usage.append(word)
+    else:
+        usage.append(NOTHING)
     return usage, error_counter
 
 
-def test_basic(word: str, mnemonic: list, line_number: int) -> int:
+def handle_fourth_element(word: str, line_number) -> int:
     error_counter = 0
     if test_char(word, 'first'):
         error_counter += show_error(3, line_number)
+    else:
+        if not test_char(word, 'i'):
+            error_counter += show_error(5, line_number)
+    return error_counter
+
+
+def handle_exceptional_cases(word: str, mnemonic: str, mnemonics: list, exceptional_mnemonics: list, declaration: list,
+                             usage: list,
+                             line_number: int) -> tuple:
+    error_counter = 0
+    i = test_exceptional_mnemonics(mnemonic, exceptional_mnemonics)
+    if i == 0:
+        if not compare_list_string(word, mnemonics):
+            error_counter += show_error(6, line_number)
+        usage, err_c = handle_third_element(word, usage, mnemonics, line_number)
+        error_counter += err_c
+    elif i == 1:
+        usage, err_c = test_hexadecimal_case(word, usage, line_number)
+        error_counter += err_c
+    elif i == 2:
+        pass
+    elif i == 3:
+        pass
+    return declaration, usage, error_counter
+
+
+def test_basic(word: str, mnemonics: list, line_number: int) -> tuple:
+    error_counter = 0
+    state = True
+    if test_char(word, 'first'):
+        error_counter += show_error(3, line_number)
+        state = False
     if not test_char(word, 'length'):
         error_counter += show_error(12, line_number)
-    if compare_list_string(mnemonic, word):
+        state = False
+    if compare_list_string(word, mnemonics):
         error_counter += show_error(7, line_number)
-    return error_counter
+        state = False
+    return state, error_counter
 
 
 def test_char(word: str, mode: str) -> bool:
@@ -90,7 +133,34 @@ def test_word_len(word: str, length: int) -> bool:
     return len(word) == length
 
 
-def compare_list_string(s_list: list, word: str) -> bool:
+def test_exceptional_mnemonics(mnemonic: str, exceptional_mnemonics: list):
+    for i in range(4):
+        if exceptional_mnemonics[i] == mnemonic:
+            if i == 0:
+                return 1
+            else:
+                return i
+    return 0
+
+
+def test_hexadecimal_case(word: str, usage: list, line_number: int) -> tuple:
+    error_counter = 0
+    if not test_word_len(word, 4):
+        error_counter += show_error(13, line_number)
+    if not test_hexadecimal(word):
+        error_counter += show_error(14, line_number)
+    usage.append(NOTHING)
+    return usage, error_counter
+
+
+def test_hexadecimal(word: str):
+    for i in word:
+        if not ('0' <= i <= '9') and not ('A' <= i <= 'F'):
+            return False
+    return True
+
+
+def compare_list_string(word: str, s_list: list) -> bool:
     for i in s_list:
         if i == word:
             return True
