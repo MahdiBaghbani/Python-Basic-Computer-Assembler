@@ -17,7 +17,7 @@ def preprocess(source: str):
         line_number += 1
 
 
-def precompile(line: str, line_number: int, declaration: list, usage: list) -> tuple:
+def precompile(line: str, declaration: list, usage: list, line_number: int) -> tuple:
     end = "END"
     mnemonics = ["AND", "ADD", "LDA", "STA", "BUN",
                  "BSA", "ISZ", "CLA", "CLE", "CMA",
@@ -25,7 +25,7 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> t
                  "SNA", "SZA", "SZE", "HLT", "INP",
                  "OUT", "SKI", "SKO", "ION", "IOF",
                  "ORG", "DEC", "HEX", end]
-    exceptionalMnemonics = ["ORG", "HEX", "DEC", end]
+    exceptional_mnemonics = ["ORG", "HEX", "DEC", end]
 
     error_counter = 0
     string = line.split()
@@ -34,12 +34,23 @@ def precompile(line: str, line_number: int, declaration: list, usage: list) -> t
     if words_number == 1:
         if string[0] != end:
             error_counter += show_error(2, line_number)
+        declaration.append(NOTHING)
+        usage.append(NOTHING)
     elif words_number == 2:
-        pass
+        declaration.append(NOTHING)
+        declaration, usage, err_c = handle_exceptional_cases(string[1], string[0], mnemonics, exceptional_mnemonics,
+                                                             declaration, usage, line_number)
+        error_counter += err_c
     elif words_number == 3:
         pass
     elif words_number == 4:
-        pass
+        declaration, usage, err_c = handle_exceptional_cases(string[2], string[1], mnemonics, exceptional_mnemonics,
+                                                             declaration, usage, line_number)
+        error_counter += err_c
+        if string[1] != end:
+            declaration, err_c = handle_first_element(string[0], declaration, mnemonics, line_number)
+            error_counter += err_c
+            error_counter += handle_fourth_element(string[3], line_number)
     else:
         error_counter += show_error(1, line_number)
 
@@ -97,9 +108,18 @@ def handle_exceptional_cases(word: str, mnemonic: str, mnemonics: list, exceptio
         usage, err_c = test_hexadecimal_case(word, usage, line_number)
         error_counter += err_c
     elif i == 2:
-        pass
+        usage, err_c = test_decimal_case(word, usage, line_number)
+        error_counter += err_c
     elif i == 3:
-        pass
+        declaration, usage, err_c = handle_end_error(declaration, usage, line_number)
+        error_counter += err_c
+    return declaration, usage, error_counter
+
+
+def handle_end_error(declaration: list, usage: list, line_number: int) -> tuple:
+    declaration.append(NOTHING)
+    usage.append(NOTHING)
+    error_counter = show_error(17, line_number)
     return declaration, usage, error_counter
 
 
@@ -147,17 +167,29 @@ def test_hexadecimal_case(word: str, usage: list, line_number: int) -> tuple:
     error_counter = 0
     if not test_word_len(word, 4):
         error_counter += show_error(13, line_number)
-    if not test_hexadecimal(word):
-        error_counter += show_error(14, line_number)
+    else:
+        if not test_hexadecimal(word):
+            error_counter += show_error(14, line_number)
     usage.append(NOTHING)
     return usage, error_counter
 
 
-def test_hexadecimal(word: str):
+def test_hexadecimal(word: str) -> bool:
     for i in word:
         if not ('0' <= i <= '9') and not ('A' <= i <= 'F'):
             return False
     return True
+
+
+def test_decimal_case(word: str, usage: list, line_number: int) -> tuple:
+    error_counter = 0
+    if word.isdecimal():
+        if int(word) > 2 ** 16:
+            error_counter += show_error(15, line_number)
+    else:
+        error_counter += show_error(16, line_number)
+    usage.append(NOTHING)
+    return usage, error_counter
 
 
 def compare_list_string(word: str, s_list: list) -> bool:
