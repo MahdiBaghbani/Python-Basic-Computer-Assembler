@@ -1,0 +1,13 @@
+lab, AfD wat
+vic, LfA Fra
+wat, IfZ vic
+CfE lab i
+SfO vic i
+IfN wat i
+lab, fEX 55FF
+wat, fRG 77DF
+vic, fEC 1111
+Fra, fEC 2223
+HEff 55FF i
+ORf 77DF i
+DEf 1111 i

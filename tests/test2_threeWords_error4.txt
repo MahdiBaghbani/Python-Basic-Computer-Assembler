@@ -1,0 +1,13 @@
+lab, ADD wat
+vic, LDA Fra
+wat, ISZ vic
+CLE lab 4i
+SKO vic i4
+ION wat j
+lab, HEX 55FF
+wat, ORG 77DF
+vic, DEC 1111
+Fra, DEC 2223
+HEX 55FF k
+ORG 77DF 2ft
+DEC 1111 5fg5

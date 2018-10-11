@@ -1,0 +1,5 @@
+lab, HEX 55FF
+wat, ORG 77DF
+vic, DEC 1111
+Fra, DEC 2223
+END

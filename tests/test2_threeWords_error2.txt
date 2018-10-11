@@ -1,0 +1,13 @@
+5ab, ADD wat
+6ic, LDA Fra
+7at, ISZ vic
+CLE lab i
+SKO vic i
+ION wat i
+8ab, HEX 55FF
+9at, ORG 77DF
+7ic, DEC 1111
+6ra, DEC 2223
+HEX 55FF i
+ORG 77DF i
+DEC 1111 i
