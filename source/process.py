@@ -1,11 +1,17 @@
+from source.analyzer import analyzer
+from source.cleaner import cleaner
 from source.precompile import precompile
+from source.assembler import assembler
 
 
-def process(source: str):
-    first_round(source)
+def process(source: str, output_file: str):
+    source = cleaner(source)
+    analyze(source)
+    symbols_address = precompile(source)
+    obj_dict = assembler(source, symbols_address)
 
 
-def first_round(source: str):
+def analyze(source: str):
     declaration = set()
     usage = set()
     error_counter = 0
@@ -13,7 +19,7 @@ def first_round(source: str):
     lines = source.split('\n')
 
     for line in lines:
-        declaration, usage, err_c = precompile(line, declaration, usage, line_number)
+        declaration, usage, err_c = analyzer(line, declaration, usage, line_number)
         error_counter += err_c
         line_number += 1
 

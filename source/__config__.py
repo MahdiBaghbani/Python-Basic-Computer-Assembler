@@ -1,6 +1,6 @@
 """ Memory Reference Instructions (MRI) """
-MRI = {"AND": [0, 1], "ADD": [1, 9], "LDA": [2, "A"], "STA": [3, "B"],
-       "BUN": [4, "C"], "BSA": [5, "D"], "ISZ": [6, "E"]}
+MRI = {"AND": ["0", "8"], "ADD": ["1", "9"], "LDA": ["2", "A"], "STA": ["3", "B"],
+       "BUN": ["4", "C"], "BSA": ["5", "D"], "ISZ": ["6", "E"]}
 
 """ Register Reference Instructions (Non-MRI) """
 NON_MRI = {"CLA": 0x7800, "CLE": 0x7400, "CMA": 0x7200, "CME": 0x7100, "CIR": 0x7080, "CIL": 0x7040, "INC": 0x7020,
