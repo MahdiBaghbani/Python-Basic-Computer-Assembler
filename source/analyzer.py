@@ -18,11 +18,11 @@ def analyzer(line: str, declaration: set, usage: set, line_number: int) -> tuple
         error_counter += err_c
 
     elif words_number == 3:
-        if (strings[0] in MRI or strings[0] in PREUDOMSTRUCTION[1:3]) and (
-                strings[1] not in MRI or strings[1] not in PREUDOMSTRUCTION[1:3]):
+        x = strings[0] in MRI or strings[0] in PREUDOMSTRUCTION[1:3]
+        y = strings[1] in MRI or strings[1] in PREUDOMSTRUCTION[1:3]
+        if x and not y:
             a = 1
-        elif (strings[1] in MRI or strings[1] in PREUDOMSTRUCTION[1:3]) and (
-                strings[0] not in MRI or strings[0] not in PREUDOMSTRUCTION[1:3]):
+        elif y and not x:
             a = 2
         else:
             a = 0
