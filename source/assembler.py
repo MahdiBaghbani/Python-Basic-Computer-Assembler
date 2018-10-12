@@ -17,7 +17,7 @@ def assembler(source: str, symbols_address: dict):
             if word == PREUDOMSTRUCTION[3]:
                 break
             else:
-                obj_dict[LC] = NON_MRI[strings[0]]
+                obj_dict[LC] = hex(NON_MRI[word])
         elif switch == 2:
             if word == PREUDOMSTRUCTION[0]:
                 LC = int(strings[1]) - 1
@@ -54,8 +54,13 @@ def _assemble(strings: list, symbols_address: dict, index1: int, index2: int):
     return hex(int(assembled, 16))
 
 
-def num_converter(word: str, number: str):
-    if word == PREUDOMSTRUCTION[1]:
+def num_converter(word: str, number: str) -> str:
+    """ Converts string number to it's appreciate hexadecimal integer
+
+    :param word: HEX or DEC for determining with conversion method to use"
+    :param number: string number to be converted to integer
+    :return  hexadecimal string representation of input number"""
+    if word == PREUDOMSTRUCTION[1]:  # word == HEX
         return hex(int(number, 16))
-    else:
+    else:                            # word == DEC
         return hex(int(number))

@@ -1,14 +1,19 @@
 from source.analyzer import analyzer
-from source.cleaner import cleaner
-from source.precompile import precompile
 from source.assembler import assembler
+from source.cleaner import cleaner
+from source.compile import compiler
+from source.io_library import source_reader
+from source.precompile import precompile
 
 
-def process(source: str, output_file: str):
+def process(input_file: str, output_file: str, mode: str):
+    source = source_reader(input_file)
     source = cleaner(source)
     analyze(source)
     symbols_address = precompile(source)
     obj_dict = assembler(source, symbols_address)
+    compiler(obj_dict, output_file, mode)
+    print('\n Program compiled successfully!\n')
 
 
 def analyze(source: str):

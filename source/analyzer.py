@@ -18,9 +18,11 @@ def analyzer(line: str, declaration: set, usage: set, line_number: int) -> tuple
         error_counter += err_c
 
     elif words_number == 3:
-        if strings[0] in MRI and strings[1] not in MRI:
+        if (strings[0] in MRI or strings[0] in PREUDOMSTRUCTION[1:3]) and (
+                strings[1] not in MRI or strings[1] not in PREUDOMSTRUCTION[1:3]):
             a = 1
-        elif strings[1] in MRI and strings[0] not in MRI:
+        elif (strings[1] in MRI or strings[1] in PREUDOMSTRUCTION[1:3]) and (
+                strings[0] not in MRI or strings[0] not in PREUDOMSTRUCTION[1:3]):
             a = 2
         else:
             a = 0
@@ -38,10 +40,12 @@ def analyzer(line: str, declaration: set, usage: set, line_number: int) -> tuple
     elif words_number == 4:
         declaration, usage, err_c = handle_exceptional_cases(strings[2], strings[1], declaration, usage, line_number)
         error_counter += err_c
-        if strings[1] not in ALONE_IN_LINE:
+        if (strings[1] not in ALONE_IN_LINE) and (strings[1] != PREUDOMSTRUCTION[0]):
             declaration, err_c = handle_first_element(strings[0], declaration, line_number)
             error_counter += err_c
             error_counter += handle_fourth_element(strings[3], line_number)
+        elif strings[1] == PREUDOMSTRUCTION[0]:
+            error_counter += show_error(17, line_number)
     else:
         error_counter += show_error(1, line_number)
 
@@ -126,7 +130,7 @@ def test_word_len(word: str, length: int) -> bool:
 
 
 def test_exceptional_mnemonics(mnemonic: str):
-    if mnemonic in PREUDOMSTRUCTION[1:3]:
+    if mnemonic in PREUDOMSTRUCTION[:3]:
         return PREUDOMSTRUCTION.index(mnemonic)
     elif mnemonic in ALONE_IN_LINE:
         return 3
@@ -186,6 +190,7 @@ def show_error(error_code: int, line_number: int):
                        "Decimal number must be signed 2 byte integer (in range -32768 to 32767).\n",
                        "Decimal number should come after DEC mnemonic.\n",
                        "Using non-MRI mnemonics or END with other elements isn't correct .\n",
+                       "ORG mnemonic must be used with just a num after it, nothing before and nothing after num.\n",
                        "Invalid error code."]
     print("(line => {}) ERROR: ".format(line_number) + error_text_list[error_code])
     return 1
